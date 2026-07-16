@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState, useCallback } from "react";
 import axios from "axios";
 import Image from "next/image";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 const AUTH_KEY = "pcnb-admin-auth";
 
 type NoticeType = "URGENT" | "PLACEMENT_DRIVE" | "EVENT" | "GENERAL_INFO";
