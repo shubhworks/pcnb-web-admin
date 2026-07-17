@@ -560,7 +560,7 @@ export default function Home() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1.5">Sender Name (optional)</label>
+                  <label className="block text-sm font-medium text-slate-700 mb-1.5">Sender Name* (required)</label>
                   <input
                     value={senderName}
                     onChange={(e) => setSenderName(e.target.value)}
