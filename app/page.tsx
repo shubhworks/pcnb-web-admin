@@ -107,6 +107,7 @@ export default function Home() {
   const [allUsers, setAllUsers] = useState<User[]>([]);
   const [adminStats, setAdminStats] = useState<AdminStats | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [deletingNoticeId, setDeletingNoticeId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<Tab>("notices");
@@ -258,6 +259,31 @@ export default function Home() {
     }
   };
 
+  const handleDeleteNotice = async (notice: Notice) => {
+    if (!window.confirm(`Delete "${notice.title}"? This cannot be undone.`)) {
+      return;
+    }
+
+    setError(null);
+    setSuccess(null);
+    setDeletingNoticeId(notice.id);
+    try {
+      await api.delete(`/api/notices/${notice.id}`);
+      setNotices((currentNotices) => currentNotices.filter((item) => item.id !== notice.id));
+      setAdminStats((currentStats) => currentStats
+        ? { ...currentStats, totalNotices: Math.max(0, currentStats.totalNotices - 1) }
+        : currentStats);
+      setSuccess("Notice deleted.");
+    } catch (err: unknown) {
+      const message = axios.isAxiosError(err) && err.response?.data?.error
+        ? err.response.data.error
+        : "Unable to delete notice.";
+      setError(message);
+    } finally {
+      setDeletingNoticeId(null);
+    }
+  };
+
   const handleUpdateRole = async (userId: string, currentRole: string) => {
     const newRole = currentRole === "ADMIN" ? "STUDENT" : "ADMIN";
     if (!confirm(`Change this user's role to ${newRole}?`)) return;
@@ -362,7 +388,7 @@ export default function Home() {
               />
             </div>
               <div>
-                <p className="font-bold text-slate-900 text-sm leading-tight">PCNB Admin</p>
+                <p className="font-bold text-slate-900 text-sm leading-tight">PCNB Admin Panel</p>
                 <p className="text-xs text-slate-500 leading-tight">Gyan Ganga Placement Cell</p>
               </div>
             </div>
@@ -370,12 +396,9 @@ export default function Home() {
               <span className="hidden sm:block text-sm text-slate-600">
                 Welcome, <strong>{authUser?.username}</strong>
               </span>
-              <span className="inline-flex items-center rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700 border border-blue-200">
-                {authUser?.role}
-              </span>
               <button
                 onClick={handleLogout}
-                className="rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-medium text-slate-600 hover:bg-slate-50 transition-all"
+                className="rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-bold text-white hover:bg-red-500 bg-red-400 transition-all duration-300 cursor-pointer"
               >
                 Logout
               </button>
@@ -468,13 +491,23 @@ export default function Home() {
                             <span>{formatDate(notice.createdAt)}</span>
                           </div>
                         </div>
-                        <button
-                          onClick={() => handleViewStats(notice)}
-                          className="flex-shrink-0 flex items-center gap-1.5 rounded-lg border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-medium text-slate-600 hover:bg-slate-100 hover:border-blue-300 hover:text-blue-600 transition-all"
-                        >
-                          <SeenTick />
-                          <span>Seen By</span>
-                        </button>
+                        <div className="flex flex-shrink-0 items-center gap-2">
+                          <button
+                            onClick={() => handleViewStats(notice)}
+                            className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-medium text-slate-600 hover:bg-slate-100 hover:border-blue-300 hover:text-blue-600 transition-all"
+                          >
+                            <SeenTick />
+                            <span>Seen By</span>
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleDeleteNotice(notice)}
+                            disabled={deletingNoticeId === notice.id}
+                            className="rounded-lg border border-red-200 bg-red-50 px-3 py-1.5 text-xs font-medium text-red-700 transition-all hover:border-red-300 hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-60"
+                          >
+                            {deletingNoticeId === notice.id ? "Deleting..." : "Delete"}
+                          </button>
+                        </div>
                       </div>
                     </div>
                   );
