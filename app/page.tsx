@@ -3,6 +3,10 @@
 import { useEffect, useMemo, useState, useCallback } from "react";
 import axios from "axios";
 import Image from "next/image";
+import dynamic from 'next/dynamic';
+import 'react-quill-new/dist/quill.snow.css';
+
+const ReactQuill = dynamic(() => import('react-quill-new'), { ssr: false });
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 const AUTH_KEY = "pcnb-admin-auth";
@@ -77,8 +81,8 @@ function formatDate(iso: string) {
 function SeenTick() {
   return (
     <svg width="18" height="11" viewBox="0 0 18 11" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M1 6L5 10L11 1" stroke="#3B82F6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-      <path d="M7 6L11 10L17 1" stroke="#3B82F6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+      <path d="M1 6L5 10L11 1" stroke="#3B82F6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M7 6L11 10L17 1" stroke="#3B82F6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
 }
@@ -86,8 +90,8 @@ function SeenTick() {
 function DeliveredTick() {
   return (
     <svg width="18" height="11" viewBox="0 0 18 11" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M1 6L5 10L11 1" stroke="#94A3B8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-      <path d="M7 6L11 10L17 1" stroke="#94A3B8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+      <path d="M1 6L5 10L11 1" stroke="#94A3B8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M7 6L11 10L17 1" stroke="#94A3B8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
 }
@@ -95,7 +99,7 @@ function DeliveredTick() {
 function SentTick() {
   return (
     <svg width="10" height="10" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M1 5L4 8L9 2" stroke="#94A3B8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+      <path d="M1 5L4 8L9 2" stroke="#94A3B8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
 }
@@ -379,14 +383,14 @@ export default function Home() {
           <div className="flex items-center justify-between h-32">
             <div className="flex items-center gap-3">
               <div className="flex justify-center items-center bg-white rounded-4xl transition-all duration-300 hover:scale-105 shadow-lg shadow-emerald-600 hover:shadow-emerald-400">
-              <Image
-                src="/pcnb_icon.png"
-                alt="PCNB Logo"
-                width={100}
-                height={100}
-                className="transition-all duration-300 hover:rotate-2"
-              />
-            </div>
+                <Image
+                  src="/pcnb_icon.png"
+                  alt="PCNB Logo"
+                  width={100}
+                  height={100}
+                  className="transition-all duration-300 hover:rotate-2"
+                />
+              </div>
               <div>
                 <p className="font-bold text-slate-900 text-sm leading-tight">PCNB Admin Panel</p>
                 <p className="text-xs text-slate-500 leading-tight">Gyan Ganga Placement Cell</p>
@@ -444,11 +448,10 @@ export default function Home() {
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
-              className={`px-5 py-2 rounded-lg text-sm font-medium transition-all capitalize ${
-                activeTab === tab
+              className={`px-5 py-2 rounded-lg text-sm font-medium transition-all capitalize ${activeTab === tab
                   ? "bg-white text-slate-900 shadow-sm"
                   : "text-slate-500 hover:text-slate-700"
-              }`}
+                }`}
             >
               {tab === "notices" ? "📋 Notices" : tab === "publish" ? "📣 Publish" : "👥 Users"}
             </button>
@@ -484,7 +487,10 @@ export default function Home() {
                             )}
                           </div>
                           <h3 className="font-semibold text-slate-900 truncate">{notice.title}</h3>
-                          <p className="text-sm text-slate-500 mt-0.5 line-clamp-2">{notice.content}</p>
+                          <div
+                            className="text-sm text-slate-500 mt-0.5 line-clamp-2 [&>p]:inline"
+                            dangerouslySetInnerHTML={{ __html: notice.content }}
+                          />
                           <div className="flex items-center gap-3 mt-2 text-xs text-slate-400">
                             <span>By {notice.author?.username}</span>
                             <span>•</span>
@@ -536,14 +542,14 @@ export default function Home() {
               </div>
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1.5">Content</label>
-                <textarea
-                  value={content}
-                  onChange={(e) => setContent(e.target.value)}
-                  rows={5}
-                  className="w-full rounded-xl border border-slate-200 px-4 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all resize-none"
-                  placeholder="Write the notice details here..."
-                  required
-                />
+                <div className="bg-white rounded-xl border border-slate-200 [&_.ql-container]:min-h-[200px] [&_.ql-toolbar]:border-x-0 [&_.ql-toolbar]:border-t-0 [&_.ql-container]:border-x-0 [&_.ql-container]:border-b-0 [&_.ql-toolbar]:rounded-t-xl [&_.ql-container]:rounded-b-xl [&_.ql-tooltip]:z-50 [&_.ql-tooltip]:shadow-lg">
+                  <ReactQuill
+                    theme="snow"
+                    value={content}
+                    onChange={setContent}
+                    placeholder="Write the notice details here..."
+                  />
+                </div>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
@@ -627,16 +633,15 @@ export default function Home() {
                         </td>
                         <td className="px-6 py-3 text-slate-600">{u.email}</td>
                         <td className="px-6 py-3">
-                          <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ${
-                            u.role === 'ADMIN' ? 'bg-purple-100 text-purple-700' : 'bg-slate-100 text-slate-600'
-                          }`}>
+                          <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ${u.role === 'ADMIN' ? 'bg-purple-100 text-purple-700' : 'bg-slate-100 text-slate-600'
+                            }`}>
                             {u.role}
                           </span>
                         </td>
                         <td className="px-6 py-3">
                           {u.isEmailVerified ? (
                             <span className="inline-flex items-center gap-1 text-green-600 text-xs font-medium">
-                              <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"/></svg>
+                              <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
                               Verified
                             </span>
                           ) : (
@@ -648,11 +653,10 @@ export default function Home() {
                           {u.id !== authUser?.id && (
                             <button
                               onClick={() => handleUpdateRole(u.id, u.role)}
-                              className={`text-xs font-medium px-3 py-1.5 rounded-lg border transition-all ${
-                                u.role === 'ADMIN'
+                              className={`text-xs font-medium px-3 py-1.5 rounded-lg border transition-all ${u.role === 'ADMIN'
                                   ? 'border-red-200 text-red-600 hover:bg-red-50'
                                   : 'border-blue-200 text-blue-600 hover:bg-blue-50'
-                              }`}
+                                }`}
                             >
                               {u.role === 'ADMIN' ? 'Demote to Student' : 'Make Admin'}
                             </button>
